@@ -4,6 +4,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Main {
+    private static final String IP_ADDR = "192.168.0.20";
+    private static final int PORT_NUMBER = 8000;
+
     public static void main(String[] args) {
         /*
         Main function needs to handle socket creation and deletion
@@ -14,7 +17,7 @@ public class Main {
             String json = "{\"Response\":\"B\"}";
 
             // Create socket object with server address and port
-            Socket socket = new Socket("192.168.0.20", 8000);
+            Socket socket = new Socket(IP_ADDR, PORT_NUMBER);
 
             // Create PrintWriter object for writing to socket output stream
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
