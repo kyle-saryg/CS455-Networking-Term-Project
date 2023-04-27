@@ -1,0 +1,29 @@
+{
+    "Quiz": [
+        {
+            "Question": "How heavy is one cubic meter of water",
+            "Options": ["1 kg", "10 kg", "100 kg", "1 t"],
+            "Answer": 3
+        },
+        {
+            "Question": "How many calories are in a Costco chicken bake",
+            "Options": ["770 cal", "1280 cal", "440 cal", "1500 cal"],
+            "Answer": 0
+        },
+        {
+            "Question": "Which of the following is not a SQL joing",
+            "Options": ["Inner join", "Outer join", "Full join", "Circular join"],
+            "Answer": 3
+        },
+        {
+            "Question": "Which is not a type of network topology",
+            "Options": ["Star", "Graph", "Mesh", "Tree"],
+            "Answer": 1
+        },
+        {
+            "Question": "What is the purpose of a mutex",
+            "Options": ["Store data", "Sort data", "Synchronize data", "Manipulate data"],
+            "Answer": 2
+        }
+    ]
+}
