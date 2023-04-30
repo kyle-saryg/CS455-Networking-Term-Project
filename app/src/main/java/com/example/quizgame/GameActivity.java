@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,38 +19,35 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
-    private final String SERVER_IP = "192.168.0.20";
-    private final int SERVER_PORT = 8000;
-    private boolean gameActive;
-    Thread clientThread;
-    TextView question;
-    TextView timer;
-    Button buttonA;
-    Button buttonB;
-    Button buttonC;
-    Button buttonD;
-    CountDownTimer cdTimer;
-    long timeLeft;
-    String userAnswer = null;
+    private TextView question;
+    private TextView timer;
+    private Button buttonA;
+    private Button buttonB;
+    private Button buttonC;
+    private Button buttonD;
+    private CountDownTimer cdTimer;
+    private long timeLeft;
+    private TCPClient client;
+
+    Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        gameActive = true;
-
-        // Start connection to server
-        TCPClient client = new TCPClient();
-        clientThread = new Thread(client);
-        clientThread.start();
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        client = new TCPClient(executor);
+        executor.execute(client);
 
         question = findViewById(R.id.question);
         timer = findViewById(R.id.timer);
-        timer.setText(String.format("%02d",
-                20));
+        timer.setText(String.format("%02d", 20));
         buttonA = findViewById(R.id.buttonA);
         buttonB = findViewById(R.id.buttonB);
         buttonC = findViewById(R.id.buttonC);
@@ -96,7 +96,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
         }
-        userAnswer = obj.toString();
+        try {
+            client.sendJsonData(obj.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
         buttonA.setEnabled(false);
         buttonB.setEnabled(false);
@@ -107,15 +112,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void setGameState(String jsonString) throws JSONException {
         JSONObject gameState = new JSONObject(jsonString);
 
-        if (gameState.getBoolean("isLastQuestion")) {
-            gameActive = false;
-        }
-
         // Set question
         question.setText(gameState.getString("Question"));
 
         // Set answers
-        JSONArray answers = gameState.getJSONArray("Options");
+        JSONArray answers = gameState.getJSONArray("Selections");
         buttonA.setText(answers.getString(0));
         buttonB.setText(answers.getString(1));
         buttonC.setText(answers.getString(2));
@@ -143,12 +144,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     class TCPClient implements Runnable {
+        private final String SERVER_IP = "192.168.0.11";
+        private final int SERVER_PORT = 8000;
+        private boolean gameActive;
         public PrintWriter out;
         public BufferedReader in;
+        private final ExecutorService runner;
 
         String response;
 
+        public TCPClient(ExecutorService runner) {
+            this.runner = runner;
+        }
         public void run() {
+            gameActive = true;
+
+            Log.i("connect", "Connecting...");
             try {
                 // Try to connect to server
                 Socket socket = new Socket(SERVER_IP, SERVER_PORT);
@@ -160,17 +171,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     while (gameActive) {
                         // Get game state JSON from server
                         response = receiveJsonData();
-                        setGameState(response);
-                        userAnswer = null;
-                        // Busy wait for user response
-                        while (timeLeft > 0 && userAnswer == null) {
-                        }
-                        if (timeLeft == 0) {
-                            userAnswer = ""; // User didn't answer in time
-                        }
-                        sendJsonData(userAnswer);
+                        Log.i("server", "Server Response: " + response);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    setGameState(response);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
                     }
                 } catch (Exception e) {
+                    Log.e("connect", "Error: " + e);
                 } finally {
                     in.close();
                     out.close();
@@ -178,7 +192,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             } catch (Exception e) {
-
+                Log.e("connect", "Error: " + e);
             }
         }
 
@@ -192,8 +206,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             return response.toString();
         }
         public void sendJsonData(String json) throws Exception {
-            out.print(json + '#');
-            out.flush();
+            Log.i("send", "Sending to server: " + json);
+            runner.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i("send", "before: " + json);
+                    out.print(json + '#');
+                    out.flush();
+                }
+            });
         }
     }
 }
