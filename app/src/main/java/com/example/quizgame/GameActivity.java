@@ -2,6 +2,7 @@ package com.example.quizgame;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -31,8 +32,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonC;
     private Button buttonD;
     private CountDownTimer cdTimer;
-    private long timeLeft;
+    private int counter = 0;
     private TCPClient client;
+    private int questionNumber;
 
     Handler handler = new Handler(Looper.getMainLooper());
 
@@ -40,6 +42,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        questionNumber = 0;
 
         ExecutorService executor = Executors.newFixedThreadPool(4);
         client = new TCPClient(executor);
@@ -66,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonA:
                 try {
                     obj.put("choice", 0);
-                    obj.put("time", timeLeft);
+                    obj.put("time", counter);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -74,7 +78,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonB:
                 try {
                     obj.put("choice", 1);
-                    obj.put("time", timeLeft);
+                    obj.put("time", counter);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -82,7 +86,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonC:
                 try {
                     obj.put("choice", 2);
-                    obj.put("time", timeLeft);
+                    obj.put("time", counter);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -90,7 +94,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonD:
                 try {
                     obj.put("choice", 3);
-                    obj.put("time", timeLeft);
+                    obj.put("time", counter);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -102,16 +106,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             throw new RuntimeException(e);
         }
 
-
         buttonA.setEnabled(false);
         buttonB.setEnabled(false);
         buttonC.setEnabled(false);
         buttonD.setEnabled(false);
+
+        // Stop the timer
+        cdTimer.cancel();
+
     }
 
     private void setGameState(String jsonString) throws JSONException {
         JSONObject gameState = new JSONObject(jsonString);
 
+        if (gameState.getString("Question").equals("End Game")) {
+            client.endGame();
+            Intent start = new Intent(this, MainActivity.class);
+            startActivity(start);
+            return;
+        }
         // Set question
         question.setText(gameState.getString("Question"));
 
@@ -131,16 +144,21 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         // Start timer
         cdTimer = new CountDownTimer(20000, 1000) {
             @Override
-            public void onTick(long l) {
-                timeLeft = (l / 1000) % 60;
-                timer.setText(String.format("%02d", timeLeft));
+            public void onTick(long ms) {
+                if (Math.round((float)ms / 1000.0f) != counter) {
+                    counter = Math.round((float)ms / 1000.0f);
+                    timer.setText(String.valueOf(Math.round((float)ms / 1000.0f)));
+                }
+                Log.i("timer", "ms=" + ms + " til finished=" + counter);
             }
 
             @Override
             public void onFinish() {
-
+                timer.setText("0");
             }
         }.start();
+
+        questionNumber++;
     }
 
     class TCPClient implements Runnable {
@@ -186,6 +204,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (Exception e) {
                     Log.e("connect", "Error: " + e);
                 } finally {
+                    Log.i("close", "Closing socket...");
                     in.close();
                     out.close();
                     socket.close();
@@ -205,14 +224,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             return response.toString();
         }
-        public void sendJsonData(String json) throws Exception {
+        public void sendJsonData(String json) {
             Log.i("send", "Sending to server: " + json);
             runner.execute(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("send", "before: " + json);
                     out.print(json + '#');
                     out.flush();
+                }
+            });
+        }
+
+        public void endGame() {
+            Log.i("end", "Ending Game...");
+            runner.execute(new Runnable() {
+                @Override
+                public void run() {
+                    gameActive = false;
                 }
             });
         }
