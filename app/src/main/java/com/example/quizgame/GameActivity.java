@@ -23,11 +23,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private boolean gameActive;
     Thread clientThread;
     TextView question;
+    TextView timer;
     Button buttonA;
     Button buttonB;
     Button buttonC;
     Button buttonD;
-    CountDownTimer timer;
+    CountDownTimer cdTimer;
     long timeLeft;
     String userAnswer = null;
 
@@ -44,6 +45,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         clientThread.start();
 
         question = findViewById(R.id.question);
+        timer = findViewById(R.id.timer);
+        timer.setText(String.format("%02d",
+                20));
         buttonA = findViewById(R.id.buttonA);
         buttonB = findViewById(R.id.buttonB);
         buttonC = findViewById(R.id.buttonC);
@@ -124,10 +128,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         buttonD.setEnabled(true);
 
         // Start timer
-        timer = new CountDownTimer(20000, 1000) {
+        cdTimer = new CountDownTimer(20000, 1000) {
             @Override
             public void onTick(long l) {
                 timeLeft = (l / 1000) % 60;
+                timer.setText(String.format("%02d", timeLeft));
             }
 
             @Override
