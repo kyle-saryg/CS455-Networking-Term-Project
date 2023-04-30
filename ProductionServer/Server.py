@@ -3,7 +3,7 @@ import json
 
 HOST = ""  # Listen on all available network interfaces
 PORT_NUMBER = 8000
-MAX_NUMBER_OF_PLAYERS = 4
+MAX_NUMBER_OF_PLAYERS = 2
 
 def main():
     quiz = None
@@ -46,18 +46,10 @@ def main():
             print(f"RECEIVED {MAX_NUMBER_OF_PLAYERS} CONNECTIONS")
 
             for questionCtr, questionObj in enumerate(questionObjects):
-                isLastQuestion = False
-                if questionCtr == (len(questionObjects) - 1):
-                    print("Last Question")
-                    isLastQuestion = True
                 jsonData = {
-                    "Question": questionObjects[0].question,
-                    "Selections": questionObjects[0].options,
-                    "Player1Score": scores[0],
-                    "Player2Score": scores[1],
-                    "Player3Score": scores[2],
-                    "Player4Score": scores[3],
-                    "isLastQuestion": isLastQuestion
+                    "Question": questionObjects[questionCtr].question,
+                    "Selections": questionObjects[questionCtr].options,
+                    "Scores": scores
                 }
                 jsonString = json.dumps(jsonData)
                 sendToAllClients(writers, jsonString)
@@ -70,6 +62,15 @@ def main():
                     # Player has the correct answer
                     if response["choice"] == questionObj.answer:
                         scores[player] += response["time"]
+                    print(scores)
+            
+            jsonData = {
+                "Question": "End Game",
+                "Selections": [],
+                "Scores": scores
+            }
+            jsonString = json.dumps(jsonData)
+            sendToAllClients(writers, jsonString)
             
             print(scores)
 
