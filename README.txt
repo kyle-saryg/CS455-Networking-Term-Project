@@ -29,6 +29,8 @@ Server Workload Split:
 	Kyle: Generating server code, working out bugs
 
 Client Workload Split:
+	Brian: Overall client code, bug fixes, integration with Server side
+	Drake: System design, flow charting, client side server connection pseudocode
 	
 
 ___      _    _  _   _   _
