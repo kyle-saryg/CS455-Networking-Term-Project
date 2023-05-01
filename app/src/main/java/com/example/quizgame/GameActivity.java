@@ -37,7 +37,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private CountDownTimer cdTimer;
     private int counter = 0;
     private TCPClient client;
-    private int questionNumber;
+    private int userId;
 
     Handler handler = new Handler(Looper.getMainLooper());
 
@@ -45,8 +45,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
-        questionNumber = 0;
 
         ExecutorService executor = Executors.newFixedThreadPool(4);
         client = new TCPClient(executor);
@@ -124,6 +122,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void setGameState(String jsonString) throws JSONException {
         JSONObject gameState = new JSONObject(jsonString);
 
+        // Set userID
+        userId = gameState.optInt("id");
+
         String q = gameState.getString("Question");
         if (q.equals("Start Game")) {
             // Remove connecting layout and display game layout
@@ -137,9 +138,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             buttonD.setVisibility(View.VISIBLE);
             return;
         } else if (q.equals("End Game")) {
+            // Change to score activity when game ends
             client.endGame();
-            Intent start = new Intent(this, MainActivity.class);
-            startActivity(start);
+            Intent end = new Intent(this, ScoreActivity.class);
+            JSONArray jsonScores = gameState.getJSONArray("Scores");
+            int[] scores = new int[jsonScores.length()];
+            for (int i = 0; i < jsonScores.length(); ++i) {
+                scores[i] = jsonScores.optInt(i);
+            }
+            end.putExtra("scores", scores);
+            end.putExtra("id", userId);
+            startActivity(end);
             return;
         }
         // Set question
@@ -194,7 +203,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         }.start();
 
-        questionNumber++;
     }
 
     class TCPClient implements Runnable {
