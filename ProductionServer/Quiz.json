@@ -24,6 +24,92 @@
             "Question": "What is the purpose of a mutex",
             "Options": ["Store data", "Sort data", "Synchronize data", "Manipulate data"],
             "Answer": 2
+        },
+        {
+            "Question": "What was the first video game to feature co-op play?",
+            "Options": ["Pong", "Pong Doubles", "Pitfall!", "Ms. Pac-Man"],
+            "Answer": 1
+        },
+        {
+            "Question": "What was the first production vehicle to offer a turbocharger?",
+            "Options": ["1984 Chrysler Laser", "1974 BMW 2002", "1962 Corvair / Oldsmobile F-85 Jetfire", "1978 Buick Regal"],
+            "Answer": 2
+        },
+        {
+            "Question": "What video game has been credited with inventing the first-person shooter genre?",
+            "Options": ["Wolfenstein 3D", "DOOM", "Goldeneye", "Halo"],
+            "Answer": 0
+        },
+        {
+            "Question": "Area 51 is located in which US state?",
+            "Options": ["Texas", "California", "New Mexico", "Nevada"],
+            "Answer": 3
+        },
+        {
+            "Question": "Which American president appears on a one-dollar bill?",
+            "Options": ["Richard Nixon", "George Washington", "Abraham Lincoln", "Benjamin Franklin"],
+            "Answer": 1
+        },
+        {
+            "Question": "What geometric shape is generally used for stop signs?",
+            "Options": ["Triangle", "Square", "Octagon", "Rhombus"],
+            "Answer": 2
+        },
+        {
+            "Question": "Which restaurant's mascot is a clown?",
+            "Options": ["McDonalds", "Burger King", "Wendy's", "Taco Bell"],
+            "Answer": 0
+        },
+        {
+            "Question": "Who is the author of Jurrasic Park",
+            "Options": ["Stephen King", "James Patterson", "John Grisham", "Michael Crichton"],
+            "Answer": 3
+        },
+        {
+            "Question": "What is the most expensive spice by weight?",
+            "Options": ["Salt", "Saffron", "Green Cardamom", "Star Anise"],
+            "Answer": 1
+        },
+        {
+            "Question": "What is the last letter of the Greek alphabet?",
+            "Options": ["Beta", "Alpha", "Omega", "Phi"],
+            "Answer": 2
+        },
+        {
+            "Question": "What is Mountain Dew's original slogan?",
+            "Options": ["Yahoo! Mountain Dew... It'll tickle your innards!", "Get That Barefoot Feeling Drinking Mountain Dew", "Put a lLittle Ya-hoo in Your Life", "Hello Sunshine"],
+            "Answer": 0
+        },
+        {
+            "Question": "In what year did Facebook launch?",
+            "Options": ["2001", "2003", "2004", "2006"],
+            "Answer": 2
+        },
+        {
+            "Question": "Which of the following is a variety of melon?",
+            "Options": ["Zloty", "Santa Claus", "Belgium", "x86"],
+            "Answer": 1
+        },
+        {
+            "Question": "Chartreuse is a color between yellow and...",
+            "Options": ["red", "blue", "green", "pink"],
+            "Answer": 2
+        },
+        {
+            "Question": "In the MMO RPG \"Realm of the Mad God\", what dungeon is widely considered to be the most difficult?",
+            "Options": ["The Shatters ", "The Void", "Cultist Hideout", "Lost Halls"],
+            "Answer": 0
+        },
+        {
+            "Question": "What is the weight of a Gold Bar in Fallout: New Vegas?",
+            "Options": ["30 Pounds", "35 Pounds", "17 Pounds", "26 Pounds"],
+            "Answer": 1
+        },
+        {
+            "Question": "What disease can be caused by a lack of Vitamin C?",
+            "Options": ["The bends", "Conjunctivitis", "Scurvy", "Mononucleosis"],
+            "Answer": 2
         }
+
     ]
 }
