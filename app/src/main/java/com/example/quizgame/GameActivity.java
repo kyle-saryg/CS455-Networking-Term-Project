@@ -206,7 +206,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     class TCPClient implements Runnable {
-        private final String SERVER_IP = "192.168.0.11";
+        private final String SERVER_IP = "127.0.0.1";
         private final int SERVER_PORT = 8000;
         private boolean gameActive;
         public PrintWriter out;
