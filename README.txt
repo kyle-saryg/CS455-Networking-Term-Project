@@ -24,14 +24,31 @@ THE CLIENTS:
 	The clients communicate with the server when connecting, and are alerted by the server when the game starts. Once the game has started each client waits for data from the server, it then presents the
 	user with the question and options and returns data of the selection immediately once the user has made a selection or if they have waited too long and ran out of time.
 
+Server Workload Split:
+	Ramiz: System design, flow charting
+	Kyle: Generating server code, working out bugs
+
+Client Workload Split:
+	
 
 ___      _    _  _   _   _
  |  |_| |_   |  | | | \ |_
  |  | | |_   |_ |_| |_/ |_
 
-
+Server Code: Located top level folder titled 'ProductionServer'
+Android Executable: Located at top level directory titled '
 
 
  _      _             _   ___      _    _   _         _
 |_| |  |_| \ / | |\| |     |  |_| |_   |   |_| |\|/| |_
 |   |_ | |  |  | | \ |_|   |  | | |_   |_| | | | | | |_
+
+* User will need to start multiple emulators to statisfy the number of client connections
+* Hardcoded server to 'localhost' if user wants to run the server over a network would need to change ip address to the server hosted device WITHIN THE CLIENT
+
+1. Start python server 
+	* "python3 Server.py <OPTIONAL ARGUMENT: Int>"
+	* The optional argument will specify the number of client connections before starting the quiz
+		* Default value of 2
+2. Start Android emulator(s)
+	* Server will not start the quiz until specified number of clients have connected
