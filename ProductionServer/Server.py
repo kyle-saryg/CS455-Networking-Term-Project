@@ -123,9 +123,9 @@ def startDaemon(playerCount):
 # Plays the game, used as a target for 'threading.Thread()'
 def playQuiz(questionObjects, scores, readers, writers):
     signalStartQuiz(writers, scores)
-    sleep(5)
+    sleep(1)
     startQuiz(questionObjects, scores, readers, writers)
-    sleep(5)
+    sleep(3)
     endQuiz(writers, scores)
 
     # Creates a list of tuples (<Reader>, <Writer>), and closes them respectively
@@ -175,15 +175,15 @@ def startQuiz(questionObjects, scores, readers, writers):
 
 # Signals the to the client, the game will end
 def endQuiz(writers, scores):
-    jsonData = {
-        "Question": "End Game",
-        "Selections": [],
-        "Scores": scores,
-        "id": -1
-    }
-    jsonString = json.dumps(jsonData)
-
-    sendToAllClients(writers, jsonString)
+    for i, writer in enumerate(writers):
+        jsonData = {
+            "Question": "End Game",
+            "Selections": [],
+            "Scores": scores,
+            "id": i
+        }
+        jsonString = json.dumps(jsonData)
+        sendToClient(writer, jsonString)
 
 # Takes in the JSON formatted quiz, creates a list of 'QuestionOptionsAnswer' objects
 def createQuestionObjects(quiz):
