@@ -1,5 +1,6 @@
 import socket
 import json
+import time
 
 HOST = ""  # Listen on all available network interfaces
 PORT_NUMBER = 8000
@@ -44,7 +45,16 @@ def main():
                 connection_ctr += 1
 
             print(f"RECEIVED {MAX_NUMBER_OF_PLAYERS} CONNECTIONS")
+            jsonData = {
+                "Question": "Start Game",
+                "Selections": [],
+                "Scores": scores
+            }
+            jsonString = json.dumps(jsonData)
+            sendToAllClients(writers, jsonString)
 
+            time.sleep(1)
+            
             for questionCtr, questionObj in enumerate(questionObjects):
                 jsonData = {
                     "Question": questionObjects[questionCtr].question,
