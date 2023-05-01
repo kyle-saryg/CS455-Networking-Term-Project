@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -25,6 +26,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+    private ProgressBar spinner;
+    private TextView loading;
     private TextView question;
     private TextView timer;
     private Button buttonA;
@@ -51,7 +54,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         question = findViewById(R.id.question);
         timer = findViewById(R.id.timer);
-        timer.setText(String.format("%02d", 20));
+        loading = findViewById(R.id.loading);
+
+        spinner = findViewById(R.id.spinner);
         buttonA = findViewById(R.id.buttonA);
         buttonB = findViewById(R.id.buttonB);
         buttonC = findViewById(R.id.buttonC);
@@ -119,14 +124,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void setGameState(String jsonString) throws JSONException {
         JSONObject gameState = new JSONObject(jsonString);
 
-        if (gameState.getString("Question").equals("End Game")) {
+        String q = gameState.getString("Question");
+        if (q.equals("Start Game")) {
+            // Remove connecting layout and display game layout
+            spinner.setVisibility(View.GONE);
+            loading.setVisibility(View.GONE);
+            timer.setVisibility(View.VISIBLE);
+            question.setVisibility(View.VISIBLE);
+            buttonA.setVisibility(View.VISIBLE);
+            buttonB.setVisibility(View.VISIBLE);
+            buttonC.setVisibility(View.VISIBLE);
+            buttonD.setVisibility(View.VISIBLE);
+            return;
+        } else if (q.equals("End Game")) {
             client.endGame();
             Intent start = new Intent(this, MainActivity.class);
             startActivity(start);
             return;
         }
         // Set question
-        question.setText(gameState.getString("Question"));
+        question.setText(q);
 
         // Set answers
         JSONArray answers = gameState.getJSONArray("Selections");
@@ -155,6 +172,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFinish() {
                 timer.setText("0");
+                // If user didn't select an option in time
+                JSONObject obj = new JSONObject();
+                try {
+                    obj.put("choice", -1);
+                    obj.put("time", counter);
+                } catch (JSONException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                try {
+                    client.sendJsonData(obj.toString());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+
+                buttonA.setEnabled(false);
+                buttonB.setEnabled(false);
+                buttonC.setEnabled(false);
+                buttonD.setEnabled(false);
             }
         }.start();
 
